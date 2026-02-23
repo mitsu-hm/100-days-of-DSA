@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define SIZE 1000003
+
+long long keys[SIZE];
+long long values[SIZE];
+int used[SIZE];
+
+long long hash(long long key) {
+    long long h = key % SIZE;
+    if (h < 0) h += SIZE;
+    return h;
+}
+
+void insert(long long key) {
+    long long idx = hash(key);
+
+    while (used[idx] && keys[idx] != key) {
+        idx = (idx + 1) % SIZE;
+    }
+
+    if (!used[idx]) {
+        used[idx] = 1;
+        keys[idx] = key;
+        values[idx] = 1;
+    } else {
+        values[idx]++;
+    }
+}
+
+long long get(long long key) {
+    long long idx = hash(key);
+
+    while (used[idx]) {
+        if (keys[idx] == key)
+            return values[idx];
+        idx = (idx + 1) % SIZE;
+    }
+    return 0;
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    long long arr[n];
+    for (int i = 0; i < n; i++) {
+        scanf("%lld", &arr[i]);
+    }
+
+    long long prefix_sum = 0;
+    long long count = 0;
+
+    insert(0);
+
+    for (int i = 0; i < n; i++) {
+        prefix_sum += arr[i];
+        count += get(prefix_sum);
+        insert(prefix_sum);
+    }
+
+    printf("%lld\n", count);
+
+    return 0;
+}
